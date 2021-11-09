@@ -1,0 +1,87 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Tooltips",
+            "name": "tooltips",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "LAT",
+            "name": "latitude",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "LONG",
+            "name": "longitude",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "Color",
+            "name": "color",
+            "kind": "Grouping"
+        },
+        {
+            "displayName": "Radius",
+            "name": "radius",
+            "kind": "Grouping"
+        }
+    ],
+    "objects": {
+        "leafletMap": {
+            "displayName": "Leaflet Map Properties",
+            "properties": {
+                "defaultColor": {
+                    "displayName": "Default color for marker",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "zoomToFit": {
+                    "displayName": "Zoom map to fit data points",
+                    "type": {
+                        "bool": true
+                    }
+                }
+            }
+        }
+    },
+    "dataViewMappings": [
+        {
+            "table": {
+                "rows": {
+                    "select": [
+                        {
+                            "for": {
+                                "in": "tooltips"
+                            }
+                        },
+                        {
+                            "for": {
+                                "in": "latitude"
+                            }
+                        },
+                        {
+                            "for": {
+                                "in": "longitude"
+                            }
+                        },
+                        {
+                            "for": {
+                                "in": "color"
+                            }
+                        },
+                        {
+                            "for": {
+                                "in": "radius"
+                            }
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
