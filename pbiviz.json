@@ -21,7 +21,7 @@
     "node_modules/leaflet/dist/leaflet.js",
     "inject.js",
     "node_modules/powerbi-visuals-utils-dataviewutils/lib/index.js",
-    "node_modules/leaflet-tooltip-layout/lib/index.js"
+    "src/leaflet-tooltip-layout.js"
   ],
   "style": "style/visual.less",
   "capabilities": "capabilities.json",

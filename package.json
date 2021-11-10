@@ -2,7 +2,6 @@
   "name": "visual",
   "dependencies": {
     "leaflet": "^1.7.1",
-    "leaflet-tooltip-layout": "^0.1.2",
     "powerbi-visuals-utils-dataviewutils": "1.2.0"
   },
   "devDependencies": {
