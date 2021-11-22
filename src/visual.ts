@@ -16,6 +16,8 @@ module powerbi.extensibility.visual {
     // imported from 3rd party library
     const initialize = (<any>L).tooltipLayout.initialize;
     const resetMarker = (<any>L).tooltipLayout.resetMarker;
+    const setMarkers = (<any>L).tooltipLayout.setMarkers;
+    const removeAllPolyline = (<any>L).tooltipLayout.removeAllPolyline;
     const getMarkers = (<any>L).tooltipLayout.getMarkers;
     const getLine = (<any>L).tooltipLayout.getLine;
 
@@ -37,7 +39,7 @@ module powerbi.extensibility.visual {
         private mapContainer: HTMLElement;
         private map: L.Map;
         private plots: Plot[];
-        private markerLayer: L.LayerGroup<any>;
+        private markers: L.Marker[] = [];
         
         constructor(options: VisualConstructorOptions) {
             if (!document) { return; }
@@ -59,7 +61,7 @@ module powerbi.extensibility.visual {
             const layers = this.getTileLayers();
             layers.forEach(layer => this.map.addLayer(L.tileLayer.wms(layer.url, layer.options)));
             this.map.attributionControl.setPrefix(false);
-            //initialize(this.map, onPolylineCreated);
+            initialize(this.map, onPolylineCreated);
         }
     
         private createMapContainer() {
@@ -87,14 +89,21 @@ module powerbi.extensibility.visual {
             this.settings = Visual.parseSettings(options && options.dataViews && options.dataViews[0]);
             this.resizeMap(options);
             this.plots = <Plot[]>this.parseData(options);
+            this.removeAllMarkers();
             this.drawMarkers();
+        }
+
+        private removeAllMarkers() {
+            // leaflet-tooltip-layout mainstains some state, so clear it
+            removeAllPolyline(this.map);
+            setMarkers([]);
+            this.markers.forEach(marker => {
+                this.map.removeLayer(marker);
+            });
         }
 
         private drawMarkers() {
             const { zoomToFit, defaultColor } = this.settings.leafletMap;
-
-            if (this.markerLayer) this.map.removeLayer(this.markerLayer);
-
             const markers = this.plots.map(({tooltips, latitude, longitude, color, radius}) => {
 
                 let iconColor = 'black';
@@ -112,15 +121,14 @@ module powerbi.extensibility.visual {
                 });
 
                 let marker = L.marker([latitude, longitude], {icon: icon});
-                this.map.addLayer(marker);
                 marker.bindTooltip(tooltips || '[Drag a field onto Tooltips]');
-                //resetMarker(marker);
+                resetMarker(marker);
                 return marker;
             });
-
-            this.markerLayer = L.layerGroup(markers);
-            this.map.addLayer(this.markerLayer);
     
+            this.markers = markers;
+            markers.forEach(marker => this.map.addLayer(marker));
+            
             // zoom out so map shows all points
             if (zoomToFit) {
                 var group = L.featureGroup(markers);
