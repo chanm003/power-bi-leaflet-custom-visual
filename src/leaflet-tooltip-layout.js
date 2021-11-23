@@ -78,6 +78,11 @@
     function getMarkers() {
         return markerList;
     }
+
+    function setMarkers(arr) {
+        markerList = arr;
+    }
+
     function getLine(marker) {
         return marker.__ply;
     }
@@ -274,6 +279,7 @@
     TooltipLayout["initialize"] = initialize;
     TooltipLayout["resetMarker"] = resetMarker;
     TooltipLayout["getMarkers"] = getMarkers;
+    TooltipLayout['setMarkers'] = setMarkers;
     TooltipLayout["getLine"] = getLine;
     TooltipLayout["removeAllPolyline"] = removeAllPolyline;
     return TooltipLayout;

@@ -16,6 +16,8 @@ module powerbi.extensibility.visual {
     // imported from 3rd party library
     const initialize = (<any>L).tooltipLayout.initialize;
     const resetMarker = (<any>L).tooltipLayout.resetMarker;
+    const setMarkers = (<any>L).tooltipLayout.setMarkers;
+    const removeAllPolyline = (<any>L).tooltipLayout.removeAllPolyline;
     const getMarkers = (<any>L).tooltipLayout.getMarkers;
     const getLine = (<any>L).tooltipLayout.getLine;
 
@@ -87,24 +89,21 @@ module powerbi.extensibility.visual {
             this.settings = Visual.parseSettings(options && options.dataViews && options.dataViews[0]);
             this.resizeMap(options);
             this.plots = <Plot[]>this.parseData(options);
+            this.removeAllMarkers();
             this.drawMarkers();
         }
 
-        private findMarkerByLatLng(latitude, longitude): L.Marker {
-            let markerFound = null;
+        private removeAllMarkers() {
+            // leaflet-tooltip-layout mainstains some state, so clear it
+            removeAllPolyline(this.map);
+            setMarkers([]);
             this.markers.forEach(marker => {
-                const { lat, lng } = (<any>marker)._latlng
-                if (latitude === lat && longitude === lng) {
-                    markerFound = marker;
-                    return; 
-                }
+                this.map.removeLayer(marker);
             });
-            return markerFound;
         }
 
         private drawMarkers() {
             const { zoomToFit, defaultColor } = this.settings.leafletMap;
-
             const markers = this.plots.map(({tooltips, latitude, longitude, color, radius}) => {
 
                 let iconColor = 'black';
@@ -121,25 +120,15 @@ module powerbi.extensibility.visual {
                     color: iconColor           
                 });
 
-                const markerFound = this.findMarkerByLatLng(latitude, longitude);
-                
-                if (!markerFound) {
-                    let marker = L.marker([latitude, longitude], {icon: icon});
-                    this.map.addLayer(marker);
-                    marker.bindTooltip(tooltips || '[Drag a field onto Tooltips]');
-                    resetMarker(marker);
-                    return marker;
-                } else {
-                    markerFound.setIcon(icon);
-                    markerFound.setLatLng([latitude, longitude]);
-                    markerFound.bindTooltip(tooltips || '[Drag a field onto Tooltips]');
-                    resetMarker(markerFound);
-                    return markerFound;
-                }
+                let marker = L.marker([latitude, longitude], {icon: icon});
+                marker.bindTooltip(tooltips || '[Drag a field onto Tooltips]');
+                resetMarker(marker);
+                return marker;
             });
-
-            this.markers = markers;
     
+            this.markers = markers;
+            markers.forEach(marker => this.map.addLayer(marker));
+            
             // zoom out so map shows all points
             if (zoomToFit) {
                 var group = L.featureGroup(markers);
